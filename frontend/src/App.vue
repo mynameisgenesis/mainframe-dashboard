@@ -74,17 +74,25 @@ onMounted(loadApps);
     </section>
 
     <section class="grid">
-      <article v-for="app in apps" :key="app.id" class="tile">
-        <img v-if="app.image_url" :src="app.image_url" :alt="app.name" />
-
-        <div class="tile-body">
+      <article
+        v-for="app in apps"
+        @click="window.open(app.url, '_blank')"
+        :key="app.id"
+        class="tile"
+        :style="{
+          backgroundImage: app.image_url
+            ? `linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.15)), url('${app.image_url}')`
+            : 'linear-gradient(135deg, #1f2937, #111827)',
+        }"
+      >
+        <div class="tile-overlay">
           <small>{{ app.category }}</small>
           <h2>{{ app.name }}</h2>
           <p>{{ app.description }}</p>
 
           <div class="actions">
-            <a :href="app.url" target="_blank">Open</a>
-            <button @click="deleteApp(app.id)">Delete</button>
+            <a :href="app.url" target="_blank" @click.stop>Open</a>
+            <button @click.stop="deleteApp(app.id)">Delete</button>
           </div>
         </div>
       </article>
@@ -149,44 +157,101 @@ button {
 }
 
 .tile {
-  background: #1f2937;
-  border-radius: 18px;
+  position: relative;
+  min-height: 240px;
+  border-radius: 22px;
   overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  transform: translateY(0);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.tile img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
-  background: #374151;
+.tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85),
+    rgba(0, 0, 0, 0.25),
+    rgba(0, 0, 0, 0.05)
+  );
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
 }
 
-.tile-body {
-  padding: 18px;
+.tile:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.5);
+}
+
+.tile:hover::before {
+  opacity: 0.9;
+}
+
+.tile-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tile:hover .tile-overlay {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .tile small {
   color: #38bdf8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tile h2 {
+  margin: 8px 0 4px;
+  font-size: 24px;
 }
 
 .tile p {
-  color: #d1d5db;
+  color: #e5e7eb;
+  margin: 0 0 16px;
 }
 
 .actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 10px;
+}
+
+.actions a,
+.actions button {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .actions a {
-  color: #38bdf8;
-  font-weight: bold;
+  color: #111827;
+  background: white;
   text-decoration: none;
 }
 
 .actions button {
-  background: #ef4444;
+  background: rgba(239, 68, 68, 0.9);
   color: white;
 }
 </style>
