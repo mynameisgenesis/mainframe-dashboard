@@ -6,6 +6,8 @@ services:
     volumes:
       - ./backend/data:/app/data
     restart: unless-stopped
+    networks:
+      - mainframe
 
   web:
     build: ./frontend
@@ -14,3 +16,9 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+    networks:
+      - mainframe
+
+networks:
+  mainframe:
+    external: true
